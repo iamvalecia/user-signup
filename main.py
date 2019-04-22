@@ -5,10 +5,69 @@ import os
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-@app.route("/")
-def sign_up():
+@app.route("/signup")
+def display_sign_up_form():
     return render_template('sign_up.html')
 
 
+def is_email(email):
+    for char in email:
+        if "@" not in char:
+            if "." in char:
+                return True
+# Just KISS for these two functions. No need for else statements.
+def contains_space(string):
+    for char in string:
+        if " " in char:
+            return True
+        
+@app.route("/signup", methods=['POST'])
+def validate_sign_up_form():
+    
+    username = request.form['username']
+    password = request.form['password']
+    password2 = request.form['password2']
+    email = request.form['email_address']
+
+    username_error= ""
+    password_error= ""
+    password2_error= ""
+    email_error= ""
+
+    if len(username) < 3 or len(username) > 20:
+        username_error = "Username should be 3-20 characters."
+    elif contains_space(username):
+        username_error = "Username should not contain spaces."
+
+    if len(password) < 3 or len(password) > 20:
+        password_error = "Password should be 3-20 characters." 
+    elif contains_space(password):
+        password_error = "Password should not contain spaces."
+
+    if password2 != password:
+        password2_error = "Passwords must match."
+
+    if not is_email(email) and email != "":
+        email_error = "Not a valid email"
+    elif contains_space(email) and email != "":
+        email_error = "Email should not contain spaces."
+    
+    if not username_error and not password_error and not password2_error and not email_error:
+        return render_template('welcome_page.html', name = username)
+    else:
+        return render_template('sign_up.html', 
+        username_error=username_error,
+        username=username,
+        password_error=password_error,
+        password2_error=password2_error,
+        email_error=email_error,
+        email=email)
+        
+
+
+#@app.route("/welcome_page", methods=['POST'])
+#def welcome():
+    #name = request.form['username']
+    #return render_template('welcome_page.html', name=name) 
 
 app.run()
