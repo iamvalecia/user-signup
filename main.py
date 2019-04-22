@@ -9,13 +9,20 @@ app.config['DEBUG'] = True
 def display_sign_up_form():
     return render_template('sign_up.html')
 
-
+#tests if input is an email. Emails contain '@' and '.'
+#
 def is_email(email):
+    counter = 0
     for char in email:
-        if "@" not in char:
-            if "." in char:
-                return True
+        if "@" in char:
+            counter = 1
+    for char in email:
+        if "." in char and counter == 1:
+            return True
+
 # Just KISS for these two functions. No need for else statements.
+#tests if input is has space. No input should have a space.
+#at the very char we detect " " this function stops to return True
 def contains_space(string):
     for char in string:
         if " " in char:
@@ -57,10 +64,12 @@ def validate_sign_up_form():
     else:
         return render_template('sign_up.html', 
         username_error=username_error,
+        #lets the user's invalid input remain
         username=username,
         password_error=password_error,
         password2_error=password2_error,
         email_error=email_error,
+        #lets the user's invalid input remain
         email=email)
         
 
